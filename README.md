@@ -18,7 +18,7 @@ My code sucks, I know. Please feel free to fix my terrible code. Coding is prett
 
 ## Legal and Licensing
 
-This program is licensed under the GNU GPL 3.0 license
+This program is licensed under the GNU GPL 2.0 license
 
 This project, all code in this project, etc. are NOT related in any way to Ninja Kiwi or Bloons TD 6.
 This is an entirely fan made project originally made to explore the game.
