@@ -1,0 +1,14 @@
+//
+// Created by Rosier on 2022-12-15.
+//
+
+#ifndef BLOONSTD6SERVER_CGROUPCONTROL_H
+#define BLOONSTD6SERVER_CGROUPCONTROL_H
+
+
+class cgroupControl {
+
+};
+
+
+#endif //BLOONSTD6SERVER_CGROUPCONTROL_H
