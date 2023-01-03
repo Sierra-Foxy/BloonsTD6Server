@@ -1,0 +1,10 @@
+[Unit]
+Requires=btd6cgroupctrl.socket
+StartLimitIntervalSec=0
+
+[Service]
+ExecStart=ExecStart=@FULL_CGROUP_SCRIPT_DIR@/btd6server/cgroup.py
+StandardInput=socket
+
+[Install]
+Also=btd6cgroupctrl.socket

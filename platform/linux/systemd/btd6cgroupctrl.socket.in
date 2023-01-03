@@ -1,0 +1,10 @@
+[Unit]
+Description="Socket unit for the BTD6 Server"
+
+[Socket]
+ListenFIFO=/run/btd6server/btd6cgroup.sock
+TriggerLimitIntervalSec=0
+#Accept=yes
+
+[Install]
+WantedBy=sockets.target

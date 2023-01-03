@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+winepid=$(ps -o pid --no-headers -C wineserver)
+winepidlen=${#winepid}
+bloonspid=$(ps -o pid --no-headers -C BloonsTD6.exe)
+bloonspidlen=${#bloonspid}
+
+
+while [ ${winepidlen} -lt 1 ] || [ ${bloonspidlen} -lt 1 ];
+do
+    winepid=$(ps -o pid --no-headers -C wineserver)
+    winepidlen=${#winepid}
+    bloonspid=$(ps -o pid --no-headers -C BloonsTD6.exe)
+    bloonspidlen=${#bloonspid}
+done
+
+serverpid=$(ps -o pid --no-headers -C BloonsTD6Server)
+serverpidlen=${#serverpid}
+
+if [ ${serverpidlen} -ge 1 ];
+then
+echo "setroot @CGROUP_ROOT@
+mkdir
+addpid $winepid
+addpid $bloonspid" &> /run/btd6server/btd6cgroup.sock
+fi
+
+
+
