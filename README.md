@@ -4,6 +4,19 @@ A server, transparent proxy and network traffic viewing tool for BTD6.
 
 ## This project is currently barely a thing. Nothing is fleshed out and most of the features are missing.
 
+## Building from source
+Make sure you have the required libraries (OpenSSL, Boost 1.81+)
+
+Download the source code and in the source directory run `mkdir build` to create the directory where the build files will go.
+
+Run `cmake -B build -G Ninja` to configure the build.
+
+Run `cmake --build build` to build the project.
+
+Install the required files with `cmake --install build`. This will install the required systemd services and their files.
+
+
+
 ## Development information
 
 This code currently runs on Linux only. The main reason for this currently is the transparent proxy.
