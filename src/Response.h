@@ -38,13 +38,15 @@ private:
     void localMatch();
     void userSearch(const http::request<http::string_body> &request);
     void publicStats();
+    void matchmakingGet();
+    void matchmakingJoin();
 
 public:
     void modifyResponse(const http::request<http::string_body> &request);
     void createCustom(const http::request<http::string_body> &request);
 
-    bool shouldModify();
-    bool shouldCreateCustom();
+    bool shouldModify(const string &body);
+    bool shouldCreateCustom(const string &body);
 
     void createHttpMessage(const string &contentType);
 };

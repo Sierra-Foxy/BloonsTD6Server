@@ -22,7 +22,7 @@ void Response::localMatch() {
                            {"IsPublic", "False"},
                            {"_enforced_player_count", 4},
                            {"_preferRegions", {"BTD6-NA-E"}},
-                           {"relay_server_ip", "5.161.142.158"},
+                           {"relay_server_ip", "127.0.0.1"},
                            {"relay_server_port", 1445},
                            {"relay_server_protocol", "TCP"}
                    }
@@ -78,7 +78,7 @@ void Response::publicStats()
             {"playerRank", 50},
             {"playerXp", 100000.0},
             {"avatar", "ProfileAvatar01"},
-            {"banner", "TeamsBannerDeafult"},
+            {"banner", "TeamsBannerDeafult"}, // Ninja Kiwi can't spell lmao
             {"gameCount", 100},
             {"gamesWon", 100},
             {"highestRound", 100},
@@ -101,8 +101,8 @@ void Response::publicStats()
             {"hiddenAchievementsClaimed", {64, 65}},
             {"heroesPlacedData", {}},
             {"towersPlacedData", {}},
-            {"spMedals", {{"CHIMPS-BLACK", 0}, {"Easy", 0}, {"Medium", 0}, {"Hard", 0}, {"PrimaryOnly", 0}, {"Deflation", 0}, {"MilitaryOnly", 0}, {"Apopalypse", 0}, {"Reverse", 0}, {"MagicOnly", 0}, {"HalfCash", 0}, {"DoubleMoabHealth", 0}, {"AlternateBloonsRounds", 0}, {"Impoppable", 0}, {"Clicks", 0}}},
-            {"coopMedals", {{"CHIMPS-BLACK", 0}, {"Easy", 0}, {"Medium", 0}, {"Hard", 0}, {"PrimaryOnly", 0}, {"Deflation", 0}, {"MilitaryOnly", 0}, {"Apopalypse", 0}, {"Reverse", 0}, {"MagicOnly", 0}, {"HalfCash", 0}, {"DoubleMoabHealth", 0}, {"AlternateBloonsRounds", 0}, {"Impoppable", 0}, {"Clicks", 0}}},
+            {"spMedals", {{"CHIMPS-BLACK", 0}, {"Easy", 0}, {"Medium", 0}, {"Hard", 0}, {"PrimaryOnly", 0}, {"Deflation", 0}, {"MilitaryOnly", 0}, {"Apopalypse", 0}, {"Reverse", 0}, {"MagicOnly", 0}, {"HalfCash", 0}, {"DoubleMoabHealth", 0}, {"AlternateBloonsRounds", 0}, {"Impoppable", 0}, {"Clicks", 0}}}, // Ninja Kiwi can't spell lmao
+            {"coopMedals", {{"CHIMPS-BLACK", 0}, {"Easy", 0}, {"Medium", 0}, {"Hard", 0}, {"PrimaryOnly", 0}, {"Deflation", 0}, {"MilitaryOnly", 0}, {"Apopalypse", 0}, {"Reverse", 0}, {"MagicOnly", 0}, {"HalfCash", 0}, {"DoubleMoabHealth", 0}, {"AlternateBloonsRounds", 0}, {"Impoppable", 0}, {"Clicks", 0}}}, // Ninja Kiwi can't spell lmao
             {"raceMedals", {}},
             {"bossMedals", {}},
             {"bossEliteMedals", {}},
@@ -120,6 +120,109 @@ void Response::publicStats()
             {"paragonsPurchasedData", {}}
     };
 }
+
+void Response::matchmakingGet()
+{
+    json::object metaData{
+        {"orchestrationMetadata", {"MM_VERSION", "0"}},
+        {"playerCount", 0},
+        {"binaryVersion", "1.7.8"},
+        {"hostname", "btd6-7"},
+        {"referee_enabled", false},
+        {"referee_required", false},
+        {"all_sessions_have_referees", false},
+        {"_country", "us"}
+    };
+    string metaDataStr = json::serialize(metaData);
+
+    json::object data{
+        {"match", {
+            {"matchID", "FFFFFF"},
+            {"playerCount", 1},
+            {"metadata", {
+                {"relay", {
+                        {"ip", "127.0.0.1"},
+                        {"port", 1445},
+                        {"uuid", "btd6-7"},
+                        {"region", "BTD6-NA-E"},
+                        {"expiresAt", std::time(nullptr) + 2592000L},
+                        {"load", 0},
+                        {"metadata", metaDataStr},
+                        {"draining", false},
+                        {"dnsResolved", true},
+                        {"isBackup", false}
+                }},
+                {"clientVersion", "34.0_34.1_34.3"},
+                {"Xr", "False"},
+                {"Difficulty", "?"},
+                {"Map", "?"},
+                {"Mode", "?"},
+                {"MapDifficulty", "Beginner"},
+                {"CreatorId", SERVER_USER_ID},
+                {"IsPublic", "False"},
+                {"_enforced_player_count", 4},
+                {"_preferRegions", {"BTD6-NA-E"}},
+                {"relay_server_ip", "127.0.0.1"},
+                {"relay_server_port", 1445},
+                {"relay_server_protocol", "TCP"}
+            }}
+        }}
+    };
+
+    m_jsonMessage["data"] = json::serialize(data);
+}
+
+void Response::matchmakingJoin()
+{
+    json::object metaData{
+            {"orchestrationMetadata", {"MM_VERSION", "0"}},
+            {"playerCount", 0},
+            {"binaryVersion", "1.7.8"},
+            {"hostname", "btd6-7"},
+            {"referee_enabled", false},
+            {"referee_required", false},
+            {"all_sessions_have_referees", false},
+            {"_country", "us"}
+    };
+    string metaDataStr = json::serialize(metaData);
+
+    json::object data{
+        {"matchID", "FFFFFF"},
+        {"playerCount", 1},
+        {"metadata", {
+                {"relay", {
+                      {"ip", "127.0.0.1"},
+                      {"port", 1445},
+                      {"uuid", "btd6-7"},
+                      {"region", "BTD6-NA-E"},
+                      {"expiresAt", std::time(nullptr) + 2592000L},
+                      {"load", 0},
+                      {"metadata", metaDataStr},
+                      {"draining", false},
+                      {"dnsResolved", true},
+                      {"isBackup", false}
+                    }},
+                {"clientVersion", "34.0_34.1_34.3"},
+                {"Xr", "False"},
+                {"Difficulty", "?"},
+                {"Map", "?"},
+                {"Mode", "?"},
+                {"MapDifficulty", "Beginner"},
+                {"CreatorId", SERVER_USER_ID},
+                {"IsPublic", "False"},
+                {"_enforced_player_count", 4},
+                {"_preferRegions", {"BTD6-NA-E"}},
+                {"relay_server_ip", "127.0.0.1"},
+                {"relay_server_port", 1445},
+                {"relay_server_protocol", "TCP"}
+            }
+        },
+        {"maxPlayers", 4}
+    };
+
+    m_jsonMessage["data"] = json::serialize(data);
+}
+
 
 // Public
 
@@ -154,10 +257,26 @@ void Response::createCustom(const http::request<http::string_body> &request)
         publicStats();
         contentType = "text/plain";
     }
+    if (m_target == "/matchmaking/get")
+    {
+        matchmakingGet();
+        contentType = "application/json";
+    }
+    if (m_target == "/matchmaking/join")
+    {
+        matchmakingJoin();
+        contentType = "application/json";
+    }
+
+    if (request["Host"] == "api.ninjakiwi.com")
+    {
+        sign();
+        m_jsonMessage["error"] = nullptr;
+    }
     createHttpMessage(contentType);
 }
 
-bool Response::shouldModify()
+bool Response::shouldModify(const string &body)
 {
     if (
         m_target == "/user/search" ||
@@ -169,13 +288,21 @@ bool Response::shouldModify()
     return false;
 }
 
-bool Response::shouldCreateCustom()
+bool Response::shouldCreateCustom(const string &body)
 {
     if (
         m_target == (string("/storage/static/11/") + string(SERVER_USER_ID) + string("/public-stats"))
         )
     {
         return true;
+    }
+    else if (m_target == "/matchmaking/get" || m_target == "/matchmaking/join")
+    {
+        json::object requestJson = json::parse(json::parse(body).as_object()["data"].as_string()).as_object();
+        if (requestJson["matchID"].as_string() == "FFFFFF")
+        {
+            return true;
+        }
     }
     return false;
 }

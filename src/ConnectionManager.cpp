@@ -106,7 +106,7 @@ void ConnectionManager::run()
         response.m_target = request.getHttpMessage().target();
         cout << "Target: " << request.getHttpMessage().target() << endl;
 
-        if (response.shouldCreateCustom())
+        if (response.shouldCreateCustom(request.getHttpMessage().body()))
         {
             response.createCustom(request.getHttpMessage());
         }
@@ -122,7 +122,7 @@ void ConnectionManager::run()
             if (isDgdataEncoded(response.getHttpMessage().body())) {
                 cout << decodeDgdata(response.getHttpMessage().body()) << endl;
             }
-            if (response.shouldModify()) {
+            if (response.shouldModify(request.getHttpMessage().body())) {
                 response.modifyResponse(request.getHttpMessage());
             }
         }
