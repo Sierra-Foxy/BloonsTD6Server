@@ -8,6 +8,7 @@ namespace fs = std::filesystem;
 
 #include "common.h"
 #include "Proxy.h"
+#include "Endpoint.h"
 
 int main() {
 //    for (auto const& dirEntry : fs::directory_iterator{"/proc"}) {

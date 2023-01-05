@@ -45,6 +45,24 @@ string ConnectionManager::decompressGzip(const string &data)
     return origin.str();
 }
 
+bool ConnectionManager::modifyResponse(const string &target)
+{
+    if (target == "/user/search")
+    {
+        return true;
+    }
+    else if (target == "/matchmaking/find/local")
+    {
+        return true;
+    }
+    return false;
+}
+
+bool ConnectionManager::customResponse(const string &target)
+{
+
+    return false;
+}
 
 // Public
 
@@ -89,18 +107,33 @@ void ConnectionManager::run()
         cout << "REQUEST:" << endl << request << endl << endl;
 
         response = m_serverConnection.receiveResponse();
-        if (isGzipEncoded(response))
-        {
+        if (isGzipEncoded(response)) {
             response.body() = decompressGzip(response.body());
             response.erase(http::field::content_encoding);
         }
         if (isDgdataEncoded(response.body())) {
             cout << decodeDgdata(response.body()) << endl;
         }
+//        if (modifyResponse(request.target())) {
+//            Endpoint apiEndpoint;
+//            apiEndpoint.makeResponse(request.target(), request.body(), response.body());
+//            response.body() = apiEndpoint.str();
+//            response.prepare_payload();
+//        }
         m_clientConnection.sendMessage(response);
         cout << "RESPONSE:" << endl << response << endl << endl;
     }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

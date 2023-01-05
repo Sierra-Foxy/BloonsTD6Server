@@ -19,4 +19,4 @@ link_libraries(ssl crypto z ${Boost_LIBRARIES})
 include_directories(/usr/local/boost_1_81_0/)
 include_directories(src)
 
-add_executable(BloonsTD6Server src/main.cpp src/ConfigFile.cpp src/ConfigFile.h src/common.h src/cgroupControl.cpp src/cgroupControl.h src/ConnectionManager.cpp src/ConnectionManager.h src/Connection.cpp src/Connection.h src/Proxy.cpp src/Proxy.h src/dgdata.cpp src/dgdata.h src/ApiEndpoint.cpp src/ApiEndpoint.h src/Hmac.cpp src/Hmac.h)
+add_executable(BloonsTD6Server src/main.cpp src/ConfigFile.cpp src/ConfigFile.h src/common.h src/cgroupControl.cpp src/cgroupControl.h src/ConnectionManager.cpp src/ConnectionManager.h src/Connection.cpp src/Connection.h src/Proxy.cpp src/Proxy.h src/dgdata.cpp src/dgdata.h src/Endpoint.cpp src/Endpoint.h src/Hmac.cpp src/Hmac.h)

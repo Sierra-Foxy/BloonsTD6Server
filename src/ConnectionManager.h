@@ -13,6 +13,7 @@
 #include "Connection.h"
 #include "common.h"
 #include "dgdata.h"
+#include "Endpoint.h"
 
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -43,7 +44,7 @@ private:
     X509 *m_caCert;
     EVP_PKEY *m_caKey;
 
-    bool m_blockBFB{true};
+    bool m_blockBFB{false};
 
 public:
 
@@ -56,6 +57,9 @@ private:
     bool isGzipEncoded(const http::message<isRequest, http::string_body> &msg);
 
     static string decompressGzip(const string &data);
+
+    bool modifyResponse(const string &target);
+    bool customResponse(const string &target);
 
 
 public:
