@@ -13,7 +13,9 @@
 #include "Connection.h"
 #include "common.h"
 #include "dgdata.h"
-#include "Endpoint.h"
+//#include "Message.h"
+#include "Response.h"
+#include "Request.h"
 
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>

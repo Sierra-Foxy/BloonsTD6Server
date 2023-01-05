@@ -92,36 +92,44 @@ void ConnectionManager::run()
 
     while(true)
     {
-        http::request<http::string_body> request{};
-        http::response<http::string_body> response{};
+        Request request{};
+        Response response{};
 
         try {
-            request = m_clientConnection.receiveRequest();
+            request.getHttpMessage() = m_clientConnection.receiveRequest();
         }
         catch (std::runtime_error &er)
         {
             break;
         }
 
-        m_serverConnection.sendMessage(request);
-        cout << "REQUEST:" << endl << request << endl << endl;
+        response.m_target = request.getHttpMessage().target();
+        cout << "Target: " << request.getHttpMessage().target() << endl;
 
-        response = m_serverConnection.receiveResponse();
-        if (isGzipEncoded(response)) {
-            response.body() = decompressGzip(response.body());
-            response.erase(http::field::content_encoding);
+        if (response.shouldCreateCustom())
+        {
+            response.createCustom(request.getHttpMessage());
         }
-        if (isDgdataEncoded(response.body())) {
-            cout << decodeDgdata(response.body()) << endl;
+        else
+        {
+            m_serverConnection.sendMessage(request.getHttpMessage());
+
+            response.getHttpMessage() = m_serverConnection.receiveResponse();
+            if (isGzipEncoded(response.getHttpMessage())) {
+                response.getHttpMessage().body() = decompressGzip(response.getHttpMessage().body());
+                response.getHttpMessage().erase(http::field::content_encoding);
+            }
+            if (isDgdataEncoded(response.getHttpMessage().body())) {
+                cout << decodeDgdata(response.getHttpMessage().body()) << endl;
+            }
+            if (response.shouldModify()) {
+                response.modifyResponse(request.getHttpMessage());
+            }
         }
-//        if (modifyResponse(request.target())) {
-//            Endpoint apiEndpoint;
-//            apiEndpoint.makeResponse(request.target(), request.body(), response.body());
-//            response.body() = apiEndpoint.str();
-//            response.prepare_payload();
-//        }
-        m_clientConnection.sendMessage(response);
-        cout << "RESPONSE:" << endl << response << endl << endl;
+        m_clientConnection.sendMessage(response.getHttpMessage());
+
+        cout << "REQUEST:" << endl << request.getHttpMessage() << endl << endl;
+        cout << "RESPONSE:" << endl << response.getHttpMessage() << endl << endl;
     }
 }
 
