@@ -27,6 +27,7 @@ class Request : public Message<http::request<http::string_body>> {
 private:
 
 public:
+    string m_target;
 
 // Functions
 private:

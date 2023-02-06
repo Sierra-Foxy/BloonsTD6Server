@@ -7,8 +7,9 @@
 
 #include <iostream>
 
-using std::cout, std::endl, std::string;
+using std::cout, std::endl, std::string, std::cerr;
 
 using unsignedString = std::basic_string<unsigned char>;
+using unsignedStringStream = std::basic_stringstream<unsigned char>;
 
 #endif //BLOONSTD6SERVER_COMMON_H

@@ -14,7 +14,7 @@ do
     bloonspidlen=${#bloonspid}
 done
 
-serverpid=$(ps -o pid --no-headers -C BloonsTD6Server)
+serverpid=$(ps -o pid --no-headers -C BTD6ToolsApp)
 serverpidlen=${#serverpid}
 
 if [ ${serverpidlen} -ge 1 ];

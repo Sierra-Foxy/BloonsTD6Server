@@ -1,22 +1,25 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(BloonsTD6Server)
+project(BloonsTD6Tools
+        VERSION 0.1.0
+        DESCRIPTION "A set of tools and applications for BTD6"
+        LANGUAGES CXX)
 
+# Versions before *might* work, but they're not tested or supported, if you need older versions to work, you're on your own
+set(minBoostVersion 1.81)
+set(minOpenSSLVersion 3.0.2)
+set(minZlibVersion 1.2.11)
+
+include(FeatureSummary)
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 17)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules)
 
+include(CheckPackages)
+include(CommonConfiguration)
+
+add_subdirectory(src)
 add_subdirectory(platform)
 
-find_package(Boost 1.81 COMPONENTS iostreams json REQUIRED)
-include_directories(${Boost_INCLUDE_DIRS})
-link_directories(${Boost_LIBRARY_DIRS})
-
-link_libraries(ssl crypto z ${Boost_LIBRARIES})
-
-include_directories(/usr/local/boost_1_81_0/)
-include_directories(src)
-
-add_executable(BloonsTD6Server src/main.cpp src/ConfigFile.cpp src/ConfigFile.h src/common.h src/cgroupControl.cpp src/cgroupControl.h src/ConnectionManager.cpp src/ConnectionManager.h src/Connection.cpp src/Connection.h src/Proxy.cpp src/Proxy.h src/dgdata.cpp src/dgdata.h src/Message.cpp src/Message.h src/Hmac.cpp src/Hmac.h src/Response.cpp src/Response.h src/Request.cpp src/Request.h src/MessageTemplates.cpp)
