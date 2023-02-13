@@ -54,7 +54,6 @@ public:
 
     GameInstance m_gameInstance;
     string m_serverId{std::to_string(std::chrono::steady_clock::now().time_since_epoch().count() % 50)};
-    // std::queue<std::shared_ptr<ClientConnection>> m_orphanConnections;
 
 // Functions
 private:
@@ -63,10 +62,8 @@ private:
 
     void handleMsg(MessageHeader &msgHeader);
     void handleLobbyMsg(LobbyMessageHeader &msgHeader);
-    // void handleExternalMsg(MultiplayerMessage &genericMsg);
 
     void onJSM(JSMMessage &msg);
-    // void onPlayerConnect(SocketType sendTo, uint8_t excludedPlayer);
     void onPlayerInfo(PlayerInfo &msg);
 
 public:
