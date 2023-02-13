@@ -100,7 +100,7 @@ void ConnectionManager::run()
     string sni = m_clientConnection.getSNI(m_clientConnection.getClientHello());
     if (m_blockBFB && sni == "bfb.ninjakiwi.com")
     {
-        cout << "blocked BFB" << endl;
+        // cout << "blocked BFB" << endl;
         return;
     }
 
@@ -134,7 +134,7 @@ void ConnectionManager::run()
         }
 
         response.m_target = request.m_target;
-        cout << "Target: " << request.getHttpMessage().target() << endl;
+        // cout << "Target: " << request.getHttpMessage().target() << endl;
 
         if (response.shouldCreateCustom(request.getHttpMessage().body()))
         {
@@ -158,9 +158,9 @@ void ConnectionManager::run()
         }
         m_clientConnection.sendMessage(response.getHttpMessage());
 
-        cout << std::put_time(std::localtime(&now), "%c") << endl;
-        cout << "REQUEST:" << endl << request.getHttpMessage() << endl << endl;
-        cout << "RESPONSE:" << endl << response.getHttpMessage() << endl << endl;
+        // cout << std::put_time(std::localtime(&now), "%c") << endl;
+        // cout << "REQUEST:" << endl << request.getHttpMessage() << endl << endl;
+        // cout << "RESPONSE:" << endl << response.getHttpMessage() << endl << endl;
     }
 }
 
@@ -239,7 +239,7 @@ void Response::publicStats()
     m_jsonMessage = {
             {"playerId", SERVER_USER_ID},
             {"playerRank", 50},
-            {"playerXp", 100000.0},
+            {"playerXp", 1900000.0},
             {"avatar", "ProfileAvatar01"},
             {"banner", "TeamsBannerDeafult"}, // Ninja Kiwi can't spell lmao
             {"gameCount", 100},

@@ -8,10 +8,10 @@
 void MultiplayerServer::recvLoop()
 {
     std::vector<struct pollfd> pfds;
-    for (auto &connection : m_connections)
+    for (auto& connection : m_connections)
     {
-        auto pfd = pfds.emplace_back();
-        pfd.fd = connection.first;
+        auto& pfd = pfds.emplace_back();
+        pfd.fd = connection->m_sock;
         pfd.events = POLLIN;
     }
 
@@ -21,10 +21,10 @@ void MultiplayerServer::recvLoop()
         {
             pfds.resize(m_connections.size());
             int i{0};
-            for (auto &connection : m_connections)
+            for (auto& connection : m_connections)
             {
-                auto &pfd = pfds[i];
-                pfd.fd = connection.first;
+                auto& pfd = pfds[i];
+                pfd.fd = connection->m_sock;
                 pfd.events = POLLIN;
                 i++;
             }
@@ -40,16 +40,46 @@ void MultiplayerServer::recvLoop()
                     char buf[10000];
                     long bytesIn{0};
                     bytesIn = recv(pfd.fd, buf, sizeof(buf), 0);
-                    auto &connection = m_connections[pfd.fd];
-                    connection.append(buf, bytesIn);
-                    // cout << connection << endl;
+                    // if (bytesIn == 0)
+                    // {
+                    //     uint8_t id;
+                    //     for (int i{0}; i < m_connections.size(); i++)
+                    //     {
+                    //         if (m_connections[i]->m_sock == pfd.fd)
+                    //         {
+                    //             id = m_connections[i]->m_id;
+                    //             try {
+                    //                 m_connectionFdMap.erase(m_connections[i]->m_sock);
+                    //             }
+                    //             catch (std::out_of_range &e) {}
+                    //             try {
+                    //                 m_connectionIdMap.erase(m_connections[i]->m_id);
+                    //             }
+                    //             catch (std::out_of_range &e) {}
+                    //             m_connections.erase(m_connections.begin() + i);
+                    //             break;
+                    //         }
+                    //     }
+                    //     close(pfd.fd);
+                    //     for (int i{0}; i < m_gameInstance.m_players.size(); i++)
+                    //     {
+                    //         if (m_gameInstance.m_players[i].m_id == id)
+                    //         {
+                    //             m_gameInstance.m_players.erase(m_gameInstance.m_players.begin()+i);
+                    //         }
+                    //     }
+                    //
+                    //     continue;
+                    // }
+                    auto connection = m_connectionFdMap[pfd.fd];
+                    connection->m_buffer.append(buf, bytesIn);
                     unsigned long split{0};
-                    MessageHead head;
-                    head.decode(connection.substr(0, 16));
-                    if ((split = connection.find("Fn", head.m_messageLength + 8)) != string::npos)
+                    MessageHeader header{connection->m_buffer.substr(0, 16)};
+                    if ((split = connection->m_buffer.find("Fn", header.m_messageLength + 8)) != string::npos)
                     {
-                        m_recvQueue.emplace(connection.substr(0, split), m_gameInstance.m_inLobbyState, pfd.fd);
-                        connection.erase(0, split + 2);
+                        std::stringstream dataStream(connection->m_buffer.substr(0, split));
+                        m_recvQueue.emplace(dataStream).m_fromSocket = pfd.fd;
+                        connection->m_buffer.erase(0, split + 2);
                     }
                 }
             }
@@ -66,148 +96,211 @@ void MultiplayerServer::msgLoop()
         if (!m_recvQueue.empty())
         {
             std::unique_lock<std::mutex> lock(m_recvQueueMutex);
-            MultiplayerMessage msg = std::move(m_recvQueue.front());
+            MessageHeader msg = std::move(m_recvQueue.front());
             m_recvQueue.pop();
             lock.unlock();
             handleMsg(msg);
         }
         else
         {
-            std::this_thread::sleep_for(20ms);
+            std::this_thread::sleep_for(5ms);
         }
     }
 }
 
-void MultiplayerServer::handleMsg(MultiplayerMessage &genericMsg)
+void MultiplayerServer::handleMsg(MessageHeader &msgHeader)
 {
-    cout << "Message Code: " << genericMsg.m_head.m_code << endl;
-    if (std::holds_alternative<JSMMessage>(genericMsg.m_body))
+    if (msgHeader.m_code == "JSM")
     {
-        auto &msg = std::get<JSMMessage>(genericMsg.m_body);
-        onJSM(genericMsg.m_parentSocket, msg.m_id);
+        JSMMessage msg(std::move(msgHeader));
+        onJSM(msg);
     }
-
-    else if (std::holds_alternative<ECHOMessage>(genericMsg.m_body))
+    else if (msgHeader.m_code == "ECHO")
     {
-        auto replyBody = std::get<ECHOMessage>(genericMsg.m_body);
-        replyBody.m_isReply = true;
-        MultiplayerMessage reply{replyBody};
-        string replyBuffer{reply.getBytes()};
-        send(genericMsg.m_parentSocket, replyBuffer.data(), replyBuffer.length(), 0);
+        ECHOMessage msg(std::move(msgHeader));
+        msg.m_messageLength = 0;
+        msg.m_isReply = true;
+        string sendBuf{msg.getBytes()};
+        send(msg.m_fromSocket, sendBuf.data(), sendBuf.length(), 0);
     }
-
-    else if (std::holds_alternative<LobbyMessage>(genericMsg.m_body))
+    else if (msgHeader.m_code.empty())
     {
-        handleLobbyMsg(genericMsg);
+        if (m_gameInstance.m_inLobbyState) {
+            LobbyMessageHeader msg(std::move(msgHeader));
+            handleLobbyMsg(msg);
+        }
     }
+    // else if (msgHeader.m_code == "ECHR")
+    // {
+    //     return;
+    // }
 }
 
-void MultiplayerServer::handleLobbyMsg(MultiplayerMessage &genericMsg)
+void MultiplayerServer::handleLobbyMsg(LobbyMessageHeader &msgHeader)
 {
-    auto &lobbyMsg = std::get<LobbyMessage>(genericMsg.m_body);
-    if (lobbyMsg.m_messageType == 0)
+    // if (msgHeader.m_msgType == LobbyMessageHeader::lobbyMsgType::EXTERNAL)
+    // {
+    //
+    // }
+    if (msgHeader.m_msgType == LobbyMessageHeader::lobbyMsgType::PLAYERINFO)
     {
-        handleExternalMsg(genericMsg);
+        PlayerInfo msg(std::move(msgHeader));
+        onPlayerInfo(msg);
     }
-    if (lobbyMsg.m_messageType == 1)
-    {
-        auto &msg = std::get<LobbyMessages::PlayerInfo>(lobbyMsg.m_data);
-        onPlayerInfo(genericMsg.m_parentSocket, lobbyMsg.m_peerId);
-    }
+    // if (lobbyMsg.m_messageType == 0)
+    // {
+    //     handleExternalMsg(genericMsg);
+    // }
+    // if (lobbyMsg.m_messageType == 1)
+    // {
+    //     auto &msg = std::get<LobbyMessages::PlayerInfo>(lobbyMsg.m_data);
+    //     onPlayerInfo(genericMsg.m_parentSocket, lobbyMsg.m_peerId);
+    // }
 }
 
-void MultiplayerServer::handleExternalMsg(MultiplayerMessage &genericMsg)
-{
+// void MultiplayerServer::handleExternalMsg(MultiplayerMessage &genericMsg)
+// {
+//
+// }
 
-}
-
-void MultiplayerServer::onJSM(SocketType sendTo, uint8_t fromPlayer)
+void MultiplayerServer::onJSM(JSMMessage &msg)
 {
-    JSRMMessage replyBody;
-    replyBody.m_success = true;
+    auto connection = m_connectionFdMap[msg.m_fromSocket];
+    // for (auto &connection : m_connections)
+    // {
+    //     if (connection.m_sock == msg.m_fromSocket)
+    //     {
+    //         m_connectionIdMap[msg.m_id]->m_connection = std::move(connection);
+    //         break;
+    //     }
+    // }
+
+    m_connectionIdMap[msg.m_id] = connection;
+    connection->m_globalId = msg.m_apiId;
+
+    for (auto& player : m_gameInstance.m_players)
+    {
+        if (player.m_id == connection->m_id)
+        {
+            connection->m_player = &player;
+        }
+    }
+
+    JSRMMessage reply;
+    reply.m_success = true;
     for (auto &player : m_gameInstance.m_players)
     {
-        replyBody.m_playersConnected.emplace_back(player.m_id);
+        reply.m_playersConnected.emplace_back(player.m_id);
     }
 
-    MultiplayerMessage reply{replyBody};
-    string replyBuffer{reply.getBytes()};
-    send(sendTo, replyBuffer.data(), replyBuffer.length(), 0);
+    string sendBuf{reply.getBytes()};
+    send(msg.m_fromSocket, sendBuf.data(), sendBuf.length(), 0);
 
     // onPlayerConnect(sendTo, fromPlayer);
 }
 
-void MultiplayerServer::onPlayerConnect(SocketType sendTo, uint8_t excludedPlayer)
+// void MultiplayerServer::onPlayerConnect(SocketType sendTo, uint8_t excludedPlayer)
+// {
+//     for (auto &player : m_gameInstance.m_players)
+//     {
+//         if (player.m_id != excludedPlayer)
+//         {
+//             LobbyMessages::PlayerInfo pInfo;
+//             pInfo.encode(player);
+//
+//             LobbyMessage msgBody(std::move(pInfo));
+//             MultiplayerMessage msg(std::move(msgBody));
+//
+//             string msgBuffer{msg.getBytes()};
+//             send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
+//         }
+//     }
+//
+// }
+
+void MultiplayerServer::onPlayerInfo(PlayerInfo &msg)
 {
     for (auto &player : m_gameInstance.m_players)
     {
-        if (player.m_id != excludedPlayer)
+        if (player.m_id != msg.m_peerId)
         {
-            LobbyMessages::PlayerInfo pInfo;
-            pInfo.encode(player);
+            PlayerInfo response{player};
+            response.m_peerId = player.m_id;
 
-            LobbyMessage msgBody(std::move(pInfo));
-            MultiplayerMessage msg(std::move(msgBody));
-
-            string msgBuffer{msg.getBytes()};
-            send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
-        }
-    }
-
-}
-
-void MultiplayerServer::onPlayerInfo(int sendTo, uint8_t playerId)
-{
-    // for (auto &player : m_gameInstance.m_players)
-    // {
-    //     if (player.m_id != playerId)
-    //     {
-    //         LobbyMessages::PlayerInfo pInfo;
-    //         pInfo.encode(player);
-    //
-    //         LobbyMessage msgBody(std::move(pInfo));
-    //         MultiplayerMessage msg(std::move(msgBody));
-    //
-    //         string msgBuffer{msg.getBytes()};
-    //         send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
-    //     }
-    // }
-
-    for (auto &player : m_gameInstance.m_players)
-    {
-        if (player.m_id == playerId && player.m_isConnecting)
-        {
+            string sendBuf{response.getBytes()};
+            send(msg.m_fromSocket, sendBuf.data(), sendBuf.length(), 0);
+            for (auto &sendingPlayer : m_gameInstance.m_players)
             {
-                for (auto &p : m_gameInstance.m_players)
+                if (sendingPlayer.m_id == msg.m_peerId && sendingPlayer.m_isConnecting)
                 {
-                    if (p.m_id != playerId)
-                    {
-                        LobbyMessages::PlayerInfo pInfo;
-                        pInfo.encode(p);
-
-                        LobbyMessage msgBody(std::move(pInfo));
-                        msgBody.m_peerId = p.m_id;
-                        MultiplayerMessage msg(std::move(msgBody));
-
-                        string msgBuffer{msg.getBytes()};
-                        send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
-                        send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
-                    }
+                    send(msg.m_fromSocket, sendBuf.data(), sendBuf.length(), 0);
+                    break;
                 }
             }
-            {
-                CoopGameTypeChangedMessage coopInfo{m_gameInstance};
+        }
 
-                LobbyMessage msgBody{ExternalMessage{coopInfo}};
-                msgBody.m_peerId = 1;
-                MultiplayerMessage msg{msgBody};
-                string msgBuffer{msg.getBytes()};
-                send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
+    }
+
+    for (auto &player : m_gameInstance.m_players)
+    {
+        if (player.m_id == msg.m_peerId)
+        {
+            if (player.m_isConnecting) {
+                CoopGameTypeChangedMessage coopInfo{m_gameInstance};
+                coopInfo.m_peerId = 1;
+
+                string sendBuf{coopInfo.getBytes()};
+                send(msg.m_fromSocket, sendBuf.data(), sendBuf.length(), 0);
+
+                MaxPlayerChangedMessage maxPlayerMsg{m_gameInstance};
+                maxPlayerMsg.m_peerId = 1;
+                maxPlayerMsg.m_maxPlayers = 4;
+
+                sendBuf = maxPlayerMsg.getBytes();
+                send(msg.m_fromSocket, sendBuf.data(), sendBuf.length(), 0);
                 player.m_isConnecting = false;
-                break;
             }
+            break;
         }
     }
+
+
+    //
+    // for (auto &player : m_gameInstance.m_players)
+    // {
+    //     if (player.m_id == playerId && player.m_isConnecting)
+    //     {
+    //         {
+    //             for (auto &p : m_gameInstance.m_players)
+    //             {
+    //                 if (p.m_id != playerId)
+    //                 {
+    //                     LobbyMessages::PlayerInfo pInfo;
+    //                     pInfo.encode(p);
+    //
+    //                     LobbyMessage msgBody(std::move(pInfo));
+    //                     msgBody.m_peerId = p.m_id;
+    //                     MultiplayerMessage msg(std::move(msgBody));
+    //
+    //                     string msgBuffer{msg.getBytes()};
+    //                     send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
+    //                     send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
+    //                 }
+    //             }
+    //         }
+    //         {
+    //             CoopGameTypeChangedMessage coopInfo{m_gameInstance};
+    //
+    //             LobbyMessage msgBody{ExternalMessage{coopInfo}};
+    //             msgBody.m_peerId = 1;
+    //             MultiplayerMessage msg{msgBody};
+    //             string msgBuffer{msg.getBytes()};
+    //             send(sendTo, msgBuffer.data(), msgBuffer.length(), 0);
+    //             player.m_isConnecting = false;
+    //             break;
+    //         }
+    //     }
+    // }
 }
 
 // Public
@@ -284,7 +377,10 @@ void MultiplayerServer::startListening(const string &addr, const string &port) {
                 continue;
             }
 
-            m_connections[clientSocket];
+            // auto& connection = m_connecting.emplace_back();
+            auto connection = m_connections.emplace_back(std::make_shared<ConnectionData>());
+            connection->m_sock = clientSocket;
+            m_connectionFdMap.emplace(clientSocket, connection);
         }
     }
     m_listenThreadInterupt = false;
@@ -311,6 +407,21 @@ MultiplayerServer::MultiplayerServer(int numMsgThreads): m_recvThread{&Multiplay
     for (int i{0}; i < numMsgThreads; i++)
     {
         m_messageThreads.emplace_back(&MultiplayerServer::msgLoop, this);
+    }
+
+    m_gameInstance.m_server = this;
+    m_gameInstance.m_changeMapCb = &MultiplayerServer::changeMap;
+}
+
+void MultiplayerServer::changeMap(const GameInstance& instance)
+{
+    for (auto& connection : m_connections)
+    {
+        MapChangedMessage msg(instance);
+        msg.m_peerId = 1;
+
+        string sendBuf{msg.getBytes()};
+        send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
     }
 }
 

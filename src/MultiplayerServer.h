@@ -14,6 +14,7 @@
 
 #include <mutex>
 #include <chrono>
+#include <memory>
 #include <thread>
 #include <vector>
 #include <cstring>
@@ -21,11 +22,22 @@
 #include <queue>
 #include <utility>
 
+struct ConnectionData {
+    uint8_t m_id;
+    SocketType m_sock;
+    string m_buffer;
+    string m_globalId;
+    Player* m_player;
+};
+
 class MultiplayerServer {
 // Variables
 private:
     SocketType m_listenSocket{};
-    std::map<SocketType, string> m_connections;
+
+    std::vector<std::shared_ptr<ConnectionData>> m_connections;
+    std::map<SocketType, std::shared_ptr<ConnectionData>> m_connectionFdMap;
+    std::map<uint8_t, std::shared_ptr<ConnectionData>> m_connectionIdMap;
 
     std::vector<std::thread> m_messageThreads;
     bool m_messageThreadsInterupt{false};
@@ -36,9 +48,10 @@ private:
     bool m_recvThreadInterupt{false};
 
     std::mutex m_recvQueueMutex;
-    std::queue<MultiplayerMessage> m_recvQueue;
+    std::queue<MessageHeader> m_recvQueue;
 
 public:
+
     GameInstance m_gameInstance;
     string m_serverId{std::to_string(std::chrono::steady_clock::now().time_since_epoch().count() % 50)};
     // std::queue<std::shared_ptr<ClientConnection>> m_orphanConnections;
@@ -48,13 +61,13 @@ private:
     void recvLoop();
     void msgLoop();
 
-    void handleMsg(MultiplayerMessage &genericMsg);
-    void handleLobbyMsg(MultiplayerMessage &genericMsg);
-    void handleExternalMsg(MultiplayerMessage &genericMsg);
+    void handleMsg(MessageHeader &msgHeader);
+    void handleLobbyMsg(LobbyMessageHeader &msgHeader);
+    // void handleExternalMsg(MultiplayerMessage &genericMsg);
 
-    void onJSM(SocketType sendTo, uint8_t fromPlayer);
-    void onPlayerConnect(SocketType sendTo, uint8_t excludedPlayer);
-    void onPlayerInfo(SocketType sendTo, uint8_t playerId);
+    void onJSM(JSMMessage &msg);
+    // void onPlayerConnect(SocketType sendTo, uint8_t excludedPlayer);
+    void onPlayerInfo(PlayerInfo &msg);
 
 public:
     explicit MultiplayerServer(int numMsgThreads);
@@ -62,6 +75,8 @@ public:
     void startListening(const string &addr, const string &port);
 
     int getNextId();
+
+    void changeMap(const GameInstance& instance);
 };
 
 

@@ -82,8 +82,4 @@ string LobbyMessage::getBytes()
     return out;
 }
 
-void LobbyMessageHeader::decode(std::stringstream &data)
-{
-    m_peerId = readLE<uint8_t>(data);
-    m_msgType = static_cast<lobbyMsgType>(readLE<uint8_t>(data));
-}
+

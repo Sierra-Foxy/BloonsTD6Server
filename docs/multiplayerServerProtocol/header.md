@@ -46,7 +46,7 @@ The version is currently always 1.
 The length of the packet not including the Magic Number or the delimiter in Little-Endian format.
 
 ### Packet Type Length (4 Bytes)
-The length of the name of the type of the packet in bytes e.g. "ECHO" is 04 00 00 00.
+The length of the name of the type of the packet in bytes e.g. "ECHOMessage" is 04 00 00 00.
 <br>
 This can be 0.
 
@@ -69,7 +69,7 @@ The type of the packet. Used for when players connect and disconnect.
 <td>Join Session Response Message</td>
 </tr>
 <tr>
-<td>ECHO</td>
+<td>ECHOMessage</td>
 <td>Latency Test Message</td>
 </tr>
 <tr>

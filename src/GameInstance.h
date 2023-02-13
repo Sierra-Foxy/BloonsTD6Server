@@ -8,9 +8,13 @@
 #include "common.h"
 #include "Player.h"
 #include "GameConfig.h"
+#include "Console.h"
 
+#include <thread>
 #include <vector>
 #include <array>
+
+class MultiplayerServer;
 
 class GameInstance {
 // Variables
@@ -25,7 +29,7 @@ public:
 
     uint8_t m_maxPlayers;
     coopGameType m_gameType{coopGameType::STANDARD};
-    maps m_map;
+    int m_map;
     bool m_goldenBloon;
     bool m_monkeyTeams;
     std::array<string, 3> m_monkeyTeamMonkeys;
@@ -38,8 +42,11 @@ public:
     string m_dailyChallengeId;
     string m_bossId;
 
+    MultiplayerServer* m_server;
+    void (MultiplayerServer::* m_changeMapCb)(const GameInstance&){nullptr};
 
-    void (*m_changeMapCb)(){nullptr};
+    Console m_console;
+    std::thread m_consoleThread;
 
 // Functions
 private:
@@ -47,7 +54,7 @@ private:
 public:
     GameInstance();
 
-    void changeMap(maps map);
+    void setMap(int map);
 };
 
 

@@ -8,6 +8,7 @@
 #include "Towers.h"
 #include "Cosmetics.h"
 #include "Bloons.h"
+#include "Net.h"
 #include "common.h"
 
 #include <boost/json.hpp>
@@ -19,6 +20,11 @@
 namespace json = boost::json;
 
 // class ClientConnection;
+
+// struct ConnectionData {
+//     SocketType m_sock;
+//     string m_buffer;
+// };
 
 class Player {
 // Variables
@@ -47,7 +53,6 @@ public:
     bool m_autoplaySetting{true};
 
     // std::shared_ptr<ClientConnection> m_connection;
-
 
 // Functions
 private:

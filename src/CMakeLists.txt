@@ -1,6 +1,6 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_executable(BTD6ToolsApp Cosmetics.h MultiplayerMessages.cpp MultiplayerMessages.h LobbyMessage.cpp LobbyMessage.h MessagePart.h Bloons.cpp Bloons.h Cosmetics.cpp ExternalMessage.cpp ExternalMessage.h GameConfig.h GameConfig.cpp)
+add_executable(BTD6ToolsApp Cosmetics.h MultiplayerMessages.cpp MultiplayerMessages.h MessagePart.h Bloons.cpp Bloons.h Cosmetics.cpp GameConfig.h GameConfig.cpp Console.cpp Console.h)
 
 target_sources(BTD6ToolsApp PRIVATE
         main.cpp
@@ -28,8 +28,12 @@ target_sources(BTD6ToolsApp PRIVATE
         MessageTemplates.cpp
         MultiplayerServer.cpp
         MultiplayerServer.h
-        ClientConnection.cpp
-        ClientConnection.h
+#        ClientConnection.cpp
+#        ClientConnection.h
+#        LobbyMessage.cpp
+#        LobbyMessage.h
+#        ExternalMessage.cpp
+#        ExternalMessage.h
         Net.cpp
         Net.h
         GameInstance.cpp

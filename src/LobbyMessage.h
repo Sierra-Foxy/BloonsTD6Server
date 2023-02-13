@@ -73,28 +73,6 @@ public:
     }
 };
 
-// ---=== Lobby Message Header ===---
-class LobbyMessageHeader : virtual protected MessagePart{
-// Variables
-private:
 
-public:
-    uint8_t m_peerId{0};
-    enum class lobbyMsgType {
-        EXTERNAL,
-        PLAYERINFO,
-        REQUESTSTART,
-        START,
-        GAMESETTINGS
-    } m_msgType;
-
-// Functions
-private:
-
-protected:
-    void decode(std::stringstream &data);
-
-public:
-};
 
 #endif //BLOONSTD6TOOLS_LOBBYMESSAGE_H
