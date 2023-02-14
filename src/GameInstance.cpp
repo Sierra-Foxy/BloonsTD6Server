@@ -34,3 +34,35 @@ void GameInstance::setMap(int map)
         (*m_server.*m_changeMapCb)(*this);
     }
 }
+
+void GameInstance::setMaxPlayers(int max)
+{
+    m_maxPlayers = max;
+    if (m_changeMaxPlayerCb) {
+        (*m_server.*m_changeMaxPlayerCb)(*this);
+    }
+}
+
+void GameInstance::setDifficulty(difficulty difficulty)
+{
+    m_difficulty = difficulty;
+    if (m_changeDifficultyCb) {
+        (*m_server.*m_changeDifficultyCb)(*this);
+    }
+}
+
+void GameInstance::setGameMode(gameMode gameMode)
+{
+    m_gameMode = gameMode;
+    if (m_changeGameModeCb) {
+        (*m_server.*m_changeGameModeCb)(*this);
+    }
+}
+
+void GameInstance::setDivision(mapDivisions division)
+{
+    m_division = division;
+    if (m_changeDivisionCb) {
+        (*m_server.*m_changeDivisionCb)(*this);
+    }
+}

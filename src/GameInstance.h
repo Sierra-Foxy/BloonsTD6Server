@@ -27,23 +27,27 @@ public:
     std::vector<Player> m_players;
     bool m_inLobbyState{true};
 
-    uint8_t m_maxPlayers;
+    uint8_t m_maxPlayers{4};
     coopGameType m_gameType{coopGameType::STANDARD};
-    int m_map;
-    bool m_goldenBloon;
-    bool m_monkeyTeams;
+    int m_map{TUTORIAL};
+    bool m_goldenBloon{false};
+    bool m_monkeyTeams{false};
     std::array<string, 3> m_monkeyTeamMonkeys;
-    bool m_collectionBonus;
-    difficulty m_difficulty;
-    gameMode m_gameMode;
-    mapDivisions m_division;
-    bool m_elite;
-    bool m_ranked;
+    bool m_collectionBonus{false};
+    difficulty m_difficulty{EASY};
+    gameMode m_gameMode{gameMode::STANDARD};
+    mapDivisions m_division{DEFAULT};
+    bool m_elite{false};
+    bool m_ranked{false};
     string m_dailyChallengeId;
     string m_bossId;
 
     MultiplayerServer* m_server;
     void (MultiplayerServer::* m_changeMapCb)(const GameInstance&){nullptr};
+    void (MultiplayerServer::* m_changeMaxPlayerCb)(const GameInstance&){nullptr};
+    void (MultiplayerServer::* m_changeDifficultyCb)(const GameInstance&){nullptr};
+    void (MultiplayerServer::* m_changeGameModeCb)(const GameInstance&){nullptr};
+    void (MultiplayerServer::* m_changeDivisionCb)(const GameInstance&){nullptr};
 
     Console m_console;
     std::thread m_consoleThread;
@@ -55,6 +59,10 @@ public:
     GameInstance();
 
     void setMap(int map);
+    void setMaxPlayers(int max);
+    void setDifficulty(difficulty difficulty);
+    void setGameMode(gameMode gameMode);
+    void setDivision(mapDivisions division);
 };
 
 

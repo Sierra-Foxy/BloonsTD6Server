@@ -74,6 +74,10 @@ public:
     int getNextId();
 
     void changeMap(const GameInstance& instance);
+    void changeMaxPlayers(const GameInstance& instance);
+    void changeDifficulty(const GameInstance& instance);
+    void changeGameMode(const GameInstance& instance);
+    void changeDivision(const GameInstance& instance);
 };
 
 

@@ -209,16 +209,16 @@ private:
 
 public:
     enum class externalMsgType: uint8_t {
-        COOPGAMETYPECHANGED = 1,
-        MAPCHANGED,
-        DIFFICULTYCHANGED,
-        GAMEMODECHANGED,
-        BOSSELITECHANGED,
-        BOSSRANKEDCHANGED,
-        MAXPLAYERSCHANGED,
-        COOPDIVISIONCHANGED,
-        PLAYERSTATUSUPDATED,
-        PLAYERSTATUSREQUESTED
+        COOP_GAME_TYPE_CHANGED = 1,
+        MAP_CHANGED,
+        DIFFICULTY_CHANGED,
+        GAME_MODE_CHANGED,
+        BOSS_ELITE_CHANGED,
+        BOSS_RANKED_CHANGED,
+        MAX_PLAYERS_CHANGED,
+        DIVISION_CHANGED,
+        PLAYER_STATUS_UPDATED,
+        PLAYER_STATUS_REQUESTED
     } m_msgType;
 
 // Functions
@@ -312,6 +312,66 @@ public:
 
     string getBytes() override;
 
+};
+
+
+class DifficultyChangedMessage : virtual private MessagePart, public ExternalMessageHeader {
+// Variables
+private:
+
+public:
+    string m_difficulty;
+
+// Functions
+private:
+    void decode(std::stringstream &data);
+
+public:
+    explicit DifficultyChangedMessage(std::stringstream& data);
+    explicit DifficultyChangedMessage(const GameInstance& instance);
+    explicit DifficultyChangedMessage(ExternalMessageHeader&& header);
+
+    string getBytes() override;
+};
+
+
+class GameModeChangedMessage : virtual private MessagePart, public ExternalMessageHeader {
+// Variables
+private:
+
+public:
+    string m_gameMode;
+
+// Functions
+private:
+    void decode(std::stringstream& data);
+
+public:
+    explicit GameModeChangedMessage(std::stringstream& data);
+    explicit GameModeChangedMessage(const GameInstance& instance);
+    explicit GameModeChangedMessage(ExternalMessageHeader&& header);
+
+    string getBytes() override;
+};
+
+
+class DivisionChangedMessage : virtual private MessagePart, public ExternalMessageHeader {
+// Variables
+private:
+
+public:
+    mapDivisions m_division;
+
+// Functions
+private:
+    void decode(std::stringstream& data);
+
+public:
+    explicit DivisionChangedMessage(std::stringstream& data);
+    explicit DivisionChangedMessage(const GameInstance& instance);
+    explicit DivisionChangedMessage(ExternalMessageHeader&& header);
+
+    string getBytes() override;
 };
 
 

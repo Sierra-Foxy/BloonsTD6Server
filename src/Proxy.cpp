@@ -150,7 +150,7 @@ void ConnectionManager::run()
                 response.getHttpMessage().erase(http::field::content_encoding);
             }
             if (isDgdataEncoded(response.getHttpMessage().body())) {
-                cout << decodeDgdata(response.getHttpMessage().body()) << endl;
+                // cout << decodeDgdata(response.getHttpMessage().body()) << endl;
             }
             if (response.shouldModify(request.getHttpMessage().body())) {
                 response.modifyResponse(request.getHttpMessage());

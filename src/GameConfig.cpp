@@ -41,15 +41,78 @@ string getDifficultyString(difficulty dif)
         case HARD:
             return "Hard";
     }
+
+    throw std::runtime_error("Unknown difficulty enum");
+}
+
+difficulty getDifficultyEnum(const string& str)
+{
+    string lowerStr(str);
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+    if (lowerStr == "easy") {
+        return EASY;
+    }
+    else if (lowerStr == "medium") {
+        return MEDIUM;
+    }
+    else if (lowerStr == "hard") {
+        return HARD;
+    }
+
+    throw std::runtime_error("Unknown difficulty string");
 }
 
 string getGameModeString(gameMode gm)
 {
-    switch (gm)
-    {
-        case gameMode::STANDARD:
-            return "Standard";
+    auto it = toGameModeStringTable.find(gm);
+    if (it != toGameModeStringTable.end()) {
+        return it->second;
     }
+
+    throw std::runtime_error("Unknown gamemode enum");
 }
+
+gameMode getGameModeEnum(const string& str)
+{
+    string lowerStr(str);
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+
+    auto it = toGameModeEnumTable.find(lowerStr);
+    if (it != toGameModeEnumTable.end()) {
+        return it->second;
+    }
+
+    throw std::runtime_error("Unknown gamemode string");
+}
+
+string getDivisionString(mapDivisions division)
+{
+    auto it = toDivisionStringTable.find(division);
+    if (it != toDivisionStringTable.end()) {
+        return it->second;
+    }
+
+    throw std::runtime_error("Unknown division enum");
+}
+
+mapDivisions getDivisionEnum(const string& str)
+{
+    string lowerStr(str);
+    std::transform(lowerStr.begin(), lowerStr.end(), lowerStr.begin(),
+                   [](unsigned char c){ return std::tolower(c); });
+
+    auto it = toDivisionEnumTable.find(lowerStr);
+    if (it != toDivisionEnumTable.end())
+    {
+        return it->second;
+    }
+
+    throw std::runtime_error("Unknown division string");
+}
+
+
+
 
 

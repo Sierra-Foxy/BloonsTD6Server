@@ -318,16 +318,63 @@ MultiplayerServer::MultiplayerServer(int numMsgThreads): m_recvThread{&Multiplay
 
     m_gameInstance.m_server = this;
     m_gameInstance.m_changeMapCb = &MultiplayerServer::changeMap;
+    m_gameInstance.m_changeMaxPlayerCb = &MultiplayerServer::changeMaxPlayers;
+    m_gameInstance.m_changeDifficultyCb = &MultiplayerServer::changeDifficulty;
+    m_gameInstance.m_changeGameModeCb = &MultiplayerServer::changeGameMode;
+    m_gameInstance.m_changeDivisionCb = &MultiplayerServer::changeDivision;
 }
 
 void MultiplayerServer::changeMap(const GameInstance& instance)
 {
+    MapChangedMessage msg(instance);
+    msg.m_peerId = 1;
+    string sendBuf{msg.getBytes()};
     for (auto& connection : m_connections)
     {
-        MapChangedMessage msg(instance);
-        msg.m_peerId = 1;
+        send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
+    }
+}
 
-        string sendBuf{msg.getBytes()};
+void MultiplayerServer::changeMaxPlayers(const GameInstance& instance)
+{
+    MaxPlayerChangedMessage msg(instance);
+    msg.m_peerId = 1;
+    string sendBuf{msg.getBytes()};
+    for (auto& connection : m_connections)
+    {
+        send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
+    }
+}
+
+void MultiplayerServer::changeDifficulty(const GameInstance& instance)
+{
+    DifficultyChangedMessage msg(instance);
+    msg.m_peerId = 1;
+    string sendBuf{msg.getBytes()};
+    for (auto& connection : m_connections)
+    {
+        send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
+    }
+}
+
+void MultiplayerServer::changeGameMode(const GameInstance& instance)
+{
+    GameModeChangedMessage msg(instance);
+    msg.m_peerId = 1;
+    string sendBuf{msg.getBytes()};
+    for (auto& connection : m_connections)
+    {
+        send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
+    }
+}
+
+void MultiplayerServer::changeDivision(const GameInstance& instance)
+{
+    DivisionChangedMessage msg(instance);
+    msg.m_peerId = 1;
+    string sendBuf{msg.getBytes()};
+    for (auto& connection : m_connections)
+    {
         send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
     }
 }

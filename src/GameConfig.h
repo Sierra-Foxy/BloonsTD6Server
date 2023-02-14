@@ -27,20 +27,81 @@ enum difficulty
 
 enum class gameMode
 {
-    STANDARD
+    ALTERNATE_BLOONS_ROUNDS,
+    CLICKS,
+    DOUBLE_MOAB_HEALTH,
+    HALF_CASH,
+    IMPOPPABLE,
+    MAGIC_ONLY,
+    STANDARD,
+    ABR = ALTERNATE_BLOONS_ROUNDS,
+    CHIMPS = CLICKS
+};
+
+static std::map<string, gameMode> const toGameModeEnumTable
+{
+    {"alternatebloonsrounds", gameMode::ALTERNATE_BLOONS_ROUNDS},
+    {"clicks", gameMode::CLICKS},
+    {"doublemoabhealth", gameMode::DOUBLE_MOAB_HEALTH},
+    {"halfcash", gameMode::HALF_CASH},
+    {"impoppable", gameMode::IMPOPPABLE},
+    {"magiconly", gameMode::MAGIC_ONLY},
+    {"standard", gameMode::STANDARD},
+    {"chimps", gameMode::CHIMPS},
+    {"abr", gameMode::ABR}
+};
+
+static std::map<gameMode, string> const toGameModeStringTable
+{
+    {gameMode::ALTERNATE_BLOONS_ROUNDS, "AlternateBloonsRounds"},
+    {gameMode::CLICKS, "Clicks"},
+    {gameMode::DOUBLE_MOAB_HEALTH, "DoubleMoabHealth"},
+    {gameMode::HALF_CASH, "HalfCash"},
+    {gameMode::IMPOPPABLE, "Impoppable"},
+    {gameMode::MAGIC_ONLY, "MagicOnly"},
+    {gameMode::STANDARD, "Standard"},
 };
 
 enum mapDivisions
 {
-    FREEFORALL,
+    FREE_FOR_ALL,
     HORIZONTAL,
     VERTICAL,
     DIAGONAL_LR,
     DIAGONAL_RL,
-    DEFAULT,
-    RADIOACTIVE,
+    RADIOACTIVE = 6,
     STAIRS,
+    DEFAULT = HORIZONTAL,
+    CORNER = STAIRS,
+    CIRCLE = RADIOACTIVE,
 };
+
+static std::map<string, mapDivisions> const toDivisionEnumTable
+{
+    {"freeforall", FREE_FOR_ALL},
+    {"horizontal", HORIZONTAL},
+    {"vertical", VERTICAL},
+    {"diagonal_lr", DIAGONAL_LR},
+    {"diagonal_rl", DIAGONAL_RL},
+    {"radioactive", RADIOACTIVE},
+    {"stairs", STAIRS},
+    {"corner", CORNER},
+    {"circle", CIRCLE}
+};
+
+static std::map<mapDivisions, string> const toDivisionStringTable
+{
+    {FREE_FOR_ALL, "FreeForAll"},
+    {HORIZONTAL, "Horizontal"},
+    {VERTICAL, "Vertical"},
+    {DIAGONAL_LR, "Diagonal_lr"},
+    {DIAGONAL_RL, "Diagonal_rl"},
+    {RADIOACTIVE, "Radioactive"},
+    {STAIRS, "Stairs"},
+    {CORNER, "Corner"},
+    {CIRCLE, "Circle"}
+};
+
 
 enum beginnerMaps
 {
@@ -342,11 +403,17 @@ static std::unordered_map<string, int> const toMapEnumTable {
 };
 
 int getMapEnum(const string& str);
-
 string getMapString(int map);
 
 string getDifficultyString(difficulty dif);
+difficulty getDifficultyEnum(const string& str);
 
 string getGameModeString(gameMode gm);
+gameMode getGameModeEnum(const string& str);
+
+string getDivisionString(mapDivisions division);
+mapDivisions getDivisionEnum(const string& str);
+
+
 
 #endif //BLOONSTD6TOOLS_GAMECONFIG_H

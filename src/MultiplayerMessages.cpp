@@ -45,6 +45,7 @@ string MessageHeader::getBytes()
     m_messageLength += 4 + m_code.length();
     writeLE<uint16_t>(m_messageLength, out);
     writeString<uint32_t>(m_code, out);
+    m_messageLength = 0;
     return out;
 }
 
@@ -303,7 +304,7 @@ ExternalMessageHeader::ExternalMessageHeader(LobbyMessageHeader &&header) : Lobb
 }
 
 ExternalMessageHeader::ExternalMessageHeader(ExternalMessageHeader &&other) noexcept
-    : m_msgType(std::exchange(other.m_msgType, ExternalMessageHeader::externalMsgType::COOPGAMETYPECHANGED)),
+    : m_msgType(std::exchange(other.m_msgType, ExternalMessageHeader::externalMsgType::COOP_GAME_TYPE_CHANGED)),
       LobbyMessageHeader(std::move(other))
 {
     decode(m_dataStream);
@@ -351,7 +352,7 @@ CoopGameTypeChangedMessage::CoopGameTypeChangedMessage(std::stringstream &data) 
 }
 
 CoopGameTypeChangedMessage::CoopGameTypeChangedMessage(const GameInstance &instance)
-    : ExternalMessageHeader(externalMsgType::COOPGAMETYPECHANGED)
+    : ExternalMessageHeader(externalMsgType::COOP_GAME_TYPE_CHANGED)
 {
     m_coopGameType = instance.m_gameType;
     m_map = instance.m_map;
@@ -421,7 +422,7 @@ MaxPlayerChangedMessage::MaxPlayerChangedMessage(std::stringstream &data) : Exte
 }
 
 MaxPlayerChangedMessage::MaxPlayerChangedMessage(const GameInstance &instance)
-    : ExternalMessageHeader(externalMsgType::MAXPLAYERSCHANGED)
+    : ExternalMessageHeader(externalMsgType::MAX_PLAYERS_CHANGED)
 {
     m_maxPlayers = instance.m_maxPlayers;
 }
@@ -468,7 +469,7 @@ MapChangedMessage::MapChangedMessage(std::stringstream& data) : ExternalMessageH
 }
 
 MapChangedMessage::MapChangedMessage(const GameInstance& instance)
-    : ExternalMessageHeader(externalMsgType::MAPCHANGED)
+    : ExternalMessageHeader(externalMsgType::MAP_CHANGED)
 {
     m_map = instance.m_map;
     m_goldenBloon = instance.m_goldenBloon;
@@ -508,8 +509,114 @@ string MapChangedMessage::getBytes()
 }
 
 
+// ---=== Difficulty Changed Message ===---
+// Private
+void DifficultyChangedMessage::decode(std::stringstream& data)
+{
+    m_difficulty = readString<uint8_t>(data);
+}
+
+// Public
+DifficultyChangedMessage::DifficultyChangedMessage(std::stringstream& data) : ExternalMessageHeader(data)
+{
+    decode(m_dataStream);
+}
+
+DifficultyChangedMessage::DifficultyChangedMessage(const GameInstance& instance)
+    : ExternalMessageHeader(externalMsgType::DIFFICULTY_CHANGED)
+{
+    m_difficulty = getDifficultyString(instance.m_difficulty);
+}
+
+DifficultyChangedMessage::DifficultyChangedMessage(ExternalMessageHeader&& header)
+    : ExternalMessageHeader(std::move(header))
+{
+    decode(m_dataStream);
+}
+
+string DifficultyChangedMessage::getBytes()
+{
+    string out;
+    writeString<uint8_t>(m_difficulty, out);
+
+    m_messageLength += 1 + m_difficulty.length();
+    out.insert(0, ExternalMessageHeader::getBytes());
+    out.append("Fn");
+    return out;
+}
 
 
+// ---=== Game Mode Changed Message ===---
+// Private
+void GameModeChangedMessage::decode(std::stringstream& data)
+{
+    m_gameMode = readString<uint8_t>(data);
+}
+
+// Public
+GameModeChangedMessage::GameModeChangedMessage(std::stringstream& data) : ExternalMessageHeader(data)
+{
+    decode(m_dataStream);
+}
+
+GameModeChangedMessage::GameModeChangedMessage(const GameInstance& instance)
+    : ExternalMessageHeader(externalMsgType::GAME_MODE_CHANGED)
+{
+    m_gameMode = getGameModeString(instance.m_gameMode);
+}
+
+GameModeChangedMessage::GameModeChangedMessage(ExternalMessageHeader&& header)
+    : ExternalMessageHeader(std::move(header))
+{
+    decode(m_dataStream);
+}
+
+string GameModeChangedMessage::getBytes()
+{
+    string out;
+    writeString<uint8_t>(m_gameMode, out);
+
+    m_messageLength += 1 + m_gameMode.length();
+    out.insert(0, ExternalMessageHeader::getBytes());
+    out.append("Fn");
+    return out;
+}
+
+// ---=== Division Changed Message ===---
+// Private
+void DivisionChangedMessage::decode(std::stringstream& data)
+{
+    m_division = static_cast<mapDivisions>(readLE<uint32_t>(data));
+}
+
+// Public
+DivisionChangedMessage::DivisionChangedMessage(std::stringstream& data) : ExternalMessageHeader(data)
+{
+    decode(m_dataStream);
+}
+
+DivisionChangedMessage::DivisionChangedMessage(const GameInstance& instance)
+    : ExternalMessageHeader(externalMsgType::DIVISION_CHANGED)
+{
+    m_division = instance.m_division;
+}
+
+DivisionChangedMessage::DivisionChangedMessage(ExternalMessageHeader&& header)
+    : ExternalMessageHeader(std::move(header))
+{
+    decode(m_dataStream);
+}
+
+string DivisionChangedMessage::getBytes()
+{
+    string out;
+    writeLE<uint32_t>(m_division, out);
+
+    m_messageLength += 4;
+    out.insert(0, ExternalMessageHeader::getBytes());
+    out.append("Fn");
+    return out;
+}
 
 
 
