@@ -44,6 +44,9 @@ target_sources(BTD6ToolsApp PRIVATE
         Towers.cpp
         MonkeyKnowledge.h)
 
+add_subdirectory(api)
+add_subdirectory(db)
+
 target_link_libraries(BTD6ToolsApp
                       OpenSSL::Crypto OpenSSL::SSL
                       ZLIB::ZLIB

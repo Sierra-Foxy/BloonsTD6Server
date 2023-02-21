@@ -216,6 +216,19 @@ void MultiplayerServer::onPlayerInfo(PlayerInfo &msg)
     }
 }
 
+
+void MultiplayerServer::startGame()
+{
+    LobbyStartMessage msg(m_gameInstance);
+    msg.m_peerId = 1;
+    string buf(msg.getBytes());
+    for (const auto& connection : m_connections)
+    {
+        send(connection->m_sock, buf.data(), buf.length(), 0);
+    }
+}
+
+
 // Public
 void MultiplayerServer::startListening(const string &addr, const string &port) {
     struct addrinfo hints{};
@@ -378,6 +391,8 @@ void MultiplayerServer::changeDivision(const GameInstance& instance)
         send(connection->m_sock, sendBuf.data(), sendBuf.length(), 0);
     }
 }
+
+
 
 
 

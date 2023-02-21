@@ -13,6 +13,10 @@
 #include "Net.h"
 #include "GameConfig.h"
 
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/device/array.hpp>
+#include <boost/iostreams/filtering_streambuf.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
 #include <boost/json.hpp>
 
 #include <exception>
@@ -22,6 +26,7 @@
 #include <utility>
 
 namespace json = boost::json;
+namespace iostreams = boost::iostreams;
 
 // ---=== Game Data Message ===---
 class GameMessage : private MessagePart {
@@ -201,6 +206,24 @@ public:
     string getBytes() override;
 };
 
+class LobbyStartMessage : virtual private MessagePart, public LobbyMessageHeader {
+// Variables
+private:
+
+public:
+    json::object m_jsonData;
+
+// Functions
+private:
+    void decode(std::stringstream& data);
+
+public:
+    explicit LobbyStartMessage(std::stringstream& data);
+    explicit LobbyStartMessage(GameInstance& instance);
+    explicit LobbyStartMessage(LobbyMessageHeader&& header);
+
+    string getBytes() override;
+};
 
 // ---=== External Message Header ===---
 class ExternalMessageHeader : virtual private MessagePart, public LobbyMessageHeader {

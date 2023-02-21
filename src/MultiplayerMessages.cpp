@@ -281,6 +281,52 @@ string PlayerInfo::getBytes()
 }
 
 
+// ---=== Lobby Start Message ===---
+// Private
+void LobbyStartMessage::decode(std::stringstream& data)
+{
+    iostreams::filtering_streambuf<iostreams::input> buf;
+    buf.push(iostreams::zlib_decompressor());
+    buf.push(data);
+    std::istream in(&buf);
+    m_jsonData = json::parse(in).as_object();
+}
+
+// Public
+LobbyStartMessage::LobbyStartMessage(std::stringstream& data) : LobbyMessageHeader(data)
+{
+    decode(m_dataStream);
+}
+
+LobbyStartMessage::LobbyStartMessage(GameInstance& instance) : LobbyMessageHeader(lobbyMsgType::START)
+{
+    for (auto& player : instance.m_players)
+    {
+        m_jsonData[std::to_string(player.m_id)] = json::serialize(player.getInfo());
+    }
+}
+
+LobbyStartMessage::LobbyStartMessage(LobbyMessageHeader&& header) : LobbyMessageHeader(std::move(header))
+{
+    decode(m_dataStream);
+}
+
+string LobbyStartMessage::getBytes()
+{
+    std::stringstream jsonString(json::serialize(m_jsonData));
+    iostreams::filtering_streambuf<iostreams::input> buf;
+    buf.push(iostreams::zlib_compressor());
+    buf.push(jsonString);
+    std::istream inStream(&buf);
+    string out(std::istreambuf_iterator<char>(inStream), {});
+
+    m_messageLength += out.length();
+    out.insert(0, LobbyMessageHeader::getBytes());
+    out.append("Fn");
+    return out;
+}
+
+
 // ---=== External Message Header ===---
 // Private
 void ExternalMessageHeader::decode(std::stringstream &data)
@@ -617,19 +663,6 @@ string DivisionChangedMessage::getBytes()
     out.append("Fn");
     return out;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

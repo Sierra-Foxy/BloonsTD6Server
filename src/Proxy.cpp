@@ -158,9 +158,9 @@ void ConnectionManager::run()
         }
         m_clientConnection.sendMessage(response.getHttpMessage());
 
-        // cout << std::put_time(std::localtime(&now), "%c") << endl;
-        // cout << "REQUEST:" << endl << request.getHttpMessage() << endl << endl;
-        // cout << "RESPONSE:" << endl << response.getHttpMessage() << endl << endl;
+        cout << std::put_time(std::localtime(&now), "%c") << endl;
+        cout << "REQUEST:" << endl << request.getHttpMessage() << endl << endl;
+        cout << "RESPONSE:" << endl << response.getHttpMessage() << endl << endl;
     }
 }
 
@@ -175,7 +175,7 @@ void Response::localMatch() {
     json::object matchData = {
             {"id", "FFFFFF"},
             {"metadata", {
-                           {"clientVersion", "34.3"},
+                           {"clientVersion", "35.0"},
                            {"Xr", "False"},
                            {"Difficulty", "?"},
                            {"Map", "?"},
@@ -315,7 +315,7 @@ void Response::matchmakingGet()
                                     {"dnsResolved", false},
                                     {"isBackup", false}
                             }},
-                            {"clientVersion", "34.3"},
+                            {"clientVersion", "35.0"},
                             {"Xr", "False"},
                             {"Difficulty", "?"},
                             {"Map", "?"},
@@ -371,7 +371,7 @@ void Response::matchmakingJoin()
                 {"dnsResolved", false},
                 {"isBackup", false}
             }},
-            {"clientVersion", "34.3"},
+            {"clientVersion", "35.0"},
             {"Xr", "False"},
             {"Difficulty", "?"},
             {"Map", "?"},

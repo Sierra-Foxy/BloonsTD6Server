@@ -66,6 +66,8 @@ private:
     void onJSM(JSMMessage &msg);
     void onPlayerInfo(PlayerInfo &msg);
 
+    void startGame();
+
 public:
     explicit MultiplayerServer(int numMsgThreads);
 
