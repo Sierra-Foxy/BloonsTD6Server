@@ -2,8 +2,14 @@
 // Created by Rosier on 2023-02-27.
 //
 
-int main(int argc, char** argv)
-{
+#include "api_proxy.hpp"
 
+
+using namespace server::proxy;
+
+int main()
+{
+    ApiProxy Proxy;
+    Proxy.run();
     return 0;
 }

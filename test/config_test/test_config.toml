@@ -1,0 +1,7 @@
+[Api]
+Generated_Responses = ["fast-static-api.nkstatic.com/storage/static/11/ffffffffffffffffffffffff/public-stats"]
+Modified_Responses = [{Url = "fast-static-api.nkstatic.com/storage/static/11/638c61427b1a2590bc72514f/public-stats", Regex = "\"playerRank\":([0-9]+),", Replacement = "100"}]
+
+[Api.Mapped_Responses]
+"api.ninjakiwi.com/utility/time" = "test_api_response.txt"
+
